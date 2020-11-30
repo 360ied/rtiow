@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"rtiow/camera"
 	"rtiow/colour"
 	"rtiow/ray"
 	"rtiow/sphere"
@@ -41,11 +42,13 @@ func main() {
 	origin := vec3.Point3{}                   // 0, 0, 0
 	horizontal := vec3.Vec3{X: viewportWidth} // viewportWidth, 0, 0
 	vertical := vec3.Vec3{Y: viewportHeight}  // 0, viewportHeight, 0
-	lowerLeftCorner := origin.SubtractVec3(
-		horizontal.DivideFloat(2.0),
-	).SubtractVec3(
-		vertical.DivideFloat(2.0),
-	).SubtractVec3(vec3.Vec3{Z: focalLength}) // 0, 0, focalLength
+	// lowerLeftCorner := origin.SubtractVec3(
+	// 	horizontal.DivideFloat(2.0),
+	// ).SubtractVec3(
+	// 	vertical.DivideFloat(2.0),
+	// ).SubtractVec3(vec3.Vec3{Z: focalLength}) // 0, 0, focalLength
+
+	cam := camera.NewCamera(aspectRatio, viewportHeight, focalLength, origin, horizontal, vertical)
 
 	// Render
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
@@ -54,14 +57,7 @@ func main() {
 		for i := 0; i < imageWidth; i++ {
 			u := float64(i) / (imageWidth - 1)
 			v := float64(j) / (imageHeight - 1)
-			r := ray.Ray{
-				Origin: origin,
-				Direction: lowerLeftCorner.AddVec3(
-					horizontal.MultiplyFloat(u),
-				).AddVec3(
-					vertical.MultiplyFloat(v),
-				).SubtractVec3(origin),
-			}
+			r := cam.Ray(u, v)
 			pixelColour := r.Colour(world)
 			colour.WriteColour(pixelColour)
 		}
