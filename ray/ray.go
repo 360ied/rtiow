@@ -19,7 +19,7 @@ func (r Ray) Colour() vec3.Colour {
 		X: 1.0,
 		Y: 1.0,
 		Z: 1.0,
-	}.MultiplyFloat(t).AddVec3(
+	}.MultiplyFloat(1.0 - t).AddVec3(
 		vec3.Colour{
 			X: 0.5,
 			Y: 0.7,
