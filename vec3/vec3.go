@@ -2,6 +2,11 @@ package vec3
 
 import "math"
 
+type (
+	Point3 = Vec3
+	Colour = Vec3
+)
+
 type Vec3 struct {
 	X, Y, Z float64
 }
