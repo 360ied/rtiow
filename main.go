@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	"rtiow/camera"
@@ -14,9 +15,10 @@ import (
 func main() {
 	// Image
 	const (
-		aspectRatio = 16.0 / 9.0
-		imageWidth  = 400
-		imageHeight = imageWidth / aspectRatio
+		aspectRatio     = 16.0 / 9.0
+		imageWidth      = 400
+		imageHeight     = imageWidth / aspectRatio
+		samplesPerPixel = 100
 	)
 
 	// World
@@ -55,11 +57,14 @@ func main() {
 	for j := int(imageHeight - 1); j >= 0; j-- {
 		_, _ = fmt.Fprintf(os.Stderr, "Scanlines remaining: %v\n", j)
 		for i := 0; i < imageWidth; i++ {
-			u := float64(i) / (imageWidth - 1)
-			v := float64(j) / (imageHeight - 1)
-			r := cam.Ray(u, v)
-			pixelColour := r.Colour(world)
-			colour.WriteColour(pixelColour)
+			pixelColour := vec3.Colour{}
+			for s := 0; s < samplesPerPixel; s++ {
+				u := (float64(i) + rand.Float64()) / (imageWidth - 1)
+				v := (float64(j) + rand.Float64()) / (imageHeight - 1)
+				r := cam.Ray(u, v)
+				pixelColour = pixelColour.AddVec3(r.Colour(world))
+			}
+			colour.WriteColour(pixelColour, samplesPerPixel)
 		}
 	}
 
