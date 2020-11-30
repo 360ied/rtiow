@@ -5,6 +5,7 @@ import (
 
 	"rtiow/constants"
 	"rtiow/vec3"
+	"rtiow/vec3/vec3util"
 )
 
 type Ray struct {
@@ -17,15 +18,20 @@ func (r Ray) At(t float64) vec3.Point3 {
 }
 
 // Linearly blends white and blue depending on the height of the y coordinate after scaling the ray direction to unit length
-func (r Ray) Colour(world Hittable) vec3.Colour {
+func (r Ray) Colour(world Hittable, depth int) vec3.Colour {
 	// t := r.HitSphere(vec3.Point3{Z: -1}, .5)
 	// if t > 0.0 {
 	// 	N := r.At(t).SubtractVec3(vec3.Vec3{Z: -1}).UnitVector()
 	// 	return vec3.Colour{X: N.X + 1, Y: N.Y + 1, Z: N.Z + 1}.MultiplyFloat(.5)
 	// }
-	rec, worldHit := world.Hit(r, 0, constants.PositiveInfinity)
+	rec, worldHit := world.Hit(r, 0.001, constants.PositiveInfinity)
+	if depth <= 0 {
+		return vec3.Colour{} // 0, 0, 0
+	}
 	if worldHit {
-		return rec.Normal.AddVec3(vec3.Colour{X: 1, Y: 1, Z: 1}).MultiplyFloat(.5)
+		// return rec.Normal.AddVec3(vec3.Colour{X: 1, Y: 1, Z: 1}).MultiplyFloat(.5)
+		target := rec.P.AddVec3(rec.Normal).AddVec3(vec3util.RandomInUnitSphere())
+		return Ray{rec.P, target.SubtractVec3(rec.P)}.Colour(world, depth-1).MultiplyFloat(.5)
 	}
 	unitDirection := r.Direction.UnitVector()
 	t := .5 * (unitDirection.Y + 1.0)

@@ -1,8 +1,15 @@
 package helpers
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 // Makes sure x is within min and max
 func Clamp(x, min, max float64) float64 {
 	return math.Min(max, math.Max(min, x))
+}
+
+func RandFloat64(min, max float64) float64 {
+	return min + (max-min)*rand.Float64()
 }

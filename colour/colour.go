@@ -2,6 +2,7 @@ package colour
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/oleiade/lane"
 
@@ -16,9 +17,9 @@ func WriteColour(out *lane.PQueue, v vec3.Colour, samplesPerPixel int, position 
 	b := v.Z
 
 	// Divide colour by the number of samples
-	r /= float64(samplesPerPixel)
-	g /= float64(samplesPerPixel)
-	b /= float64(samplesPerPixel)
+	r = divSampleGammaCorrect(r, samplesPerPixel)
+	g = divSampleGammaCorrect(g, samplesPerPixel)
+	b = divSampleGammaCorrect(b, samplesPerPixel)
 
 	// Write translated value of each colour component
 	out.Push(fmt.Sprintf("%v %v %v\n", normalize(r), normalize(g), normalize(b)), position)
@@ -26,4 +27,8 @@ func WriteColour(out *lane.PQueue, v vec3.Colour, samplesPerPixel int, position 
 
 func normalize(n float64) int {
 	return int(constants.Almost256 * helpers.Clamp(n, 0.0, constants.Almost1))
+}
+
+func divSampleGammaCorrect(t float64, samplesPerPixel int) float64 {
+	return math.Sqrt(t / float64(samplesPerPixel))
 }

@@ -21,7 +21,8 @@ func main() {
 		aspectRatio     = 16.0 / 9.0
 		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 100
+		samplesPerPixel = 50
+		maxDepth        = 25
 	)
 
 	// World
@@ -70,7 +71,7 @@ func main() {
 					u := (float64(i) + rand.Float64()) / (imageWidth - 1)
 					v := (float64(j) + rand.Float64()) / (imageHeight - 1)
 					r := cam.Ray(u, v)
-					pixelColour = pixelColour.AddVec3(r.Colour(world))
+					pixelColour = pixelColour.AddVec3(r.Colour(world, maxDepth))
 				}
 				colour.WriteColour(pqueue, pixelColour, samplesPerPixel, j*imageWidth-i)
 			}
