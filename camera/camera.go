@@ -1,7 +1,7 @@
 package camera
 
 import (
-	"rtiow/ray"
+	"rtiow/material"
 	"rtiow/vec3"
 )
 
@@ -38,8 +38,8 @@ func NewCamera(
 	}
 }
 
-func (c Camera) Ray(u, v float64) ray.Ray {
-	return ray.Ray{
+func (c Camera) Ray(u, v float64) material.Ray {
+	return material.Ray{
 		Origin: c.Origin,
 		Direction: c.LowerLeftCorner.AddVec3(
 			c.Horizontal.MultiplyFloat(u),

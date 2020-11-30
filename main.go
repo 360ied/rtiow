@@ -10,7 +10,9 @@ import (
 
 	"rtiow/camera"
 	"rtiow/colour"
-	"rtiow/ray"
+	"rtiow/material"
+	"rtiow/material/lambertian"
+	"rtiow/material/metal"
 	"rtiow/sphere"
 	"rtiow/vec3"
 )
@@ -19,22 +21,39 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 400
+		imageWidth      = 1920
 		imageHeight     = imageWidth / aspectRatio
 		samplesPerPixel = 100
 		maxDepth        = 50
 	)
 
+	materialGround := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.8, Y: 0.8}}
+	materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.7, Y: 0.3, Z: 0.3}}
+	materialLeft := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.8, Z: 0.8}}
+	materialRight := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.6, Z: 0.2}}
+
 	// World
-	world := ray.HittableList{
-		Objects: []ray.Hittable{
+	world := material.HittableList{
+		Objects: []material.Hittable{
 			sphere.Sphere{
-				Center: vec3.Point3{Z: -1},
-				Radius: .5,
+				Center: vec3.Point3{Y: -100.5, Z: -1.0}, // 0.0, -100.5, -1.0
+				Radius: 100.0,
+				Mat:    materialGround,
 			},
 			sphere.Sphere{
-				Center: vec3.Point3{Y: -100.5, Z: -1},
-				Radius: 100,
+				Center: vec3.Point3{Z: -1.0}, // 0.0, 0.0, -1.0
+				Radius: 0.5,
+				Mat:    materialCenter,
+			},
+			sphere.Sphere{
+				Center: vec3.Point3{X: -1.0, Z: -1.0}, // -1.0, 0.0, -1.0
+				Radius: 0.5,
+				Mat:    materialLeft,
+			},
+			sphere.Sphere{
+				Center: vec3.Point3{X: 1.0, Z: -1.0}, // 1.0, 0.0, -1.0
+				Radius: 0.5,
+				Mat:    materialRight,
 			},
 		},
 	}
