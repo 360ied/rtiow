@@ -33,3 +33,12 @@ func RandomInUnitSphere() vec3.Vec3 {
 		return p
 	}
 }
+
+func RandomInHemisphere(normal vec3.Vec3) vec3.Vec3 {
+	inUnitSphere := RandomInUnitSphere()
+	if inUnitSphere.Dot(normal) > 0.0 {
+		return inUnitSphere
+	} else {
+		return inUnitSphere.Negate()
+	}
+}

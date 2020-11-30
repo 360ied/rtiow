@@ -21,8 +21,8 @@ func main() {
 		aspectRatio     = 16.0 / 9.0
 		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 50
-		maxDepth        = 25
+		samplesPerPixel = 100
+		maxDepth        = 50
 	)
 
 	// World
