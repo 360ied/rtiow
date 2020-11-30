@@ -6,6 +6,7 @@ import (
 
 	"rtiow/colour"
 	"rtiow/ray"
+	"rtiow/sphere"
 	"rtiow/vec3"
 )
 
@@ -16,6 +17,20 @@ func main() {
 		imageWidth  = 400
 		imageHeight = imageWidth / aspectRatio
 	)
+
+	// World
+	world := ray.HittableList{
+		Objects: []ray.Hittable{
+			sphere.Sphere{
+				Center: vec3.Point3{Z: -1},
+				Radius: .5,
+			},
+			sphere.Sphere{
+				Center: vec3.Point3{Y: -100.5, Z: -1},
+				Radius: 100,
+			},
+		},
+	}
 
 	// Camera
 	const (
@@ -47,7 +62,7 @@ func main() {
 					vertical.MultiplyFloat(v),
 				).SubtractVec3(origin),
 			}
-			pixelColour := r.Colour()
+			pixelColour := r.Colour(world)
 			colour.WriteColour(pixelColour)
 		}
 	}

@@ -3,6 +3,7 @@ package ray
 import (
 	"math"
 
+	"rtiow/constants"
 	"rtiow/vec3"
 )
 
@@ -16,14 +17,18 @@ func (r Ray) At(t float64) vec3.Point3 {
 }
 
 // Linearly blends white and blue depending on the height of the y coordinate after scaling the ray direction to unit length
-func (r Ray) Colour() vec3.Colour {
-	t := r.HitSphere(vec3.Point3{Z: -1}, .5)
-	if t > 0.0 {
-		N := r.At(t).SubtractVec3(vec3.Vec3{Z: -1}).UnitVector()
-		return vec3.Colour{X: N.X + 1, Y: N.Y + 1, Z: N.Z + 1}.MultiplyFloat(.5)
+func (r Ray) Colour(world Hittable) vec3.Colour {
+	// t := r.HitSphere(vec3.Point3{Z: -1}, .5)
+	// if t > 0.0 {
+	// 	N := r.At(t).SubtractVec3(vec3.Vec3{Z: -1}).UnitVector()
+	// 	return vec3.Colour{X: N.X + 1, Y: N.Y + 1, Z: N.Z + 1}.MultiplyFloat(.5)
+	// }
+	rec, worldHit := world.Hit(r, 0, constants.PositiveInfinity)
+	if worldHit {
+		return rec.Normal.AddVec3(vec3.Colour{X: 1, Y: 1, Z: 1}).MultiplyFloat(.5)
 	}
 	unitDirection := r.Direction.UnitVector()
-	t = .5 * (unitDirection.Y + 1.0)
+	t := .5 * (unitDirection.Y + 1.0)
 	return vec3.Colour{
 		X: 1.0,
 		Y: 1.0,
