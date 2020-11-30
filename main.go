@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sync"
+
+	"github.com/oleiade/lane"
 
 	"rtiow/camera"
 	"rtiow/colour"
@@ -52,20 +55,37 @@ func main() {
 
 	cam := camera.NewCamera(aspectRatio, viewportHeight, focalLength, origin, horizontal, vertical)
 
+	wg := new(sync.WaitGroup)
+	pqueue := lane.NewPQueue(lane.MAXPQ)
+
 	// Render
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
 	for j := int(imageHeight - 1); j >= 0; j-- {
-		_, _ = fmt.Fprintf(os.Stderr, "Scanlines remaining: %v\n", j)
-		for i := 0; i < imageWidth; i++ {
-			pixelColour := vec3.Colour{}
-			for s := 0; s < samplesPerPixel; s++ {
-				u := (float64(i) + rand.Float64()) / (imageWidth - 1)
-				v := (float64(j) + rand.Float64()) / (imageHeight - 1)
-				r := cam.Ray(u, v)
-				pixelColour = pixelColour.AddVec3(r.Colour(world))
+		j := j
+		wg.Add(1)
+		go func() {
+			for i := 0; i < imageWidth; i++ {
+				pixelColour := vec3.Colour{}
+				for s := 0; s < samplesPerPixel; s++ {
+					u := (float64(i) + rand.Float64()) / (imageWidth - 1)
+					v := (float64(j) + rand.Float64()) / (imageHeight - 1)
+					r := cam.Ray(u, v)
+					pixelColour = pixelColour.AddVec3(r.Colour(world))
+				}
+				colour.WriteColour(pqueue, pixelColour, samplesPerPixel, j*imageWidth-i)
 			}
-			colour.WriteColour(pixelColour, samplesPerPixel)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	for {
+		pix, _ := pqueue.Pop()
+		if pix == nil {
+			break
 		}
+		fmt.Print(pix)
 	}
 
 	_, _ = fmt.Fprintf(os.Stderr, "Done.\n")

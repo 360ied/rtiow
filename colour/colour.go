@@ -3,12 +3,14 @@ package colour
 import (
 	"fmt"
 
+	"github.com/oleiade/lane"
+
 	"rtiow/constants"
 	"rtiow/helpers"
 	"rtiow/vec3"
 )
 
-func WriteColour(v vec3.Colour, samplesPerPixel int) {
+func WriteColour(out *lane.PQueue, v vec3.Colour, samplesPerPixel int, position int) {
 	r := v.X
 	g := v.Y
 	b := v.Z
@@ -19,7 +21,7 @@ func WriteColour(v vec3.Colour, samplesPerPixel int) {
 	b /= float64(samplesPerPixel)
 
 	// Write translated value of each colour component
-	fmt.Printf("%v %v %v\n", normalize(r), normalize(g), normalize(b))
+	out.Push(fmt.Sprintf("%v %v %v\n", normalize(r), normalize(g), normalize(b)), position)
 }
 
 func normalize(n float64) int {
