@@ -33,9 +33,7 @@ func main() {
 	).SubtractVec3(vec3.Vec3{Z: focalLength}) // 0, 0, focalLength
 
 	// Render
-
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
-
 	for j := int(imageHeight - 1); j >= 0; j-- {
 		_, _ = fmt.Fprintf(os.Stderr, "Scanlines remaining: %v\n", j)
 		for i := 0; i < imageWidth; i++ {
