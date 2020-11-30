@@ -13,6 +13,9 @@ func (r Ray) At(t float64) vec3.Point3 {
 
 // Linearly blends white and blue depending on the height of the y coordinate after scaling the ray direction to unit length
 func (r Ray) Colour() vec3.Colour {
+	if r.HitSphere(vec3.Point3{Z: -1}, .5) {
+		return vec3.Colour{X: 1}
+	}
 	unitDirection := r.Direction.UnitVector()
 	t := .5 * (unitDirection.Y + 1.0)
 	return vec3.Colour{
@@ -25,4 +28,14 @@ func (r Ray) Colour() vec3.Colour {
 			Y: 0.7,
 			Z: 1.0,
 		}.MultiplyFloat(t))
+}
+
+// Hardcoded sphere
+func (r Ray) HitSphere(center vec3.Point3, radius float64) bool {
+	oc := r.Origin.SubtractVec3(center)
+	a := r.Direction.Dot(r.Direction)
+	b := 2.0 * oc.Dot(r.Direction)
+	c := oc.Dot(oc) - radius*radius
+	discriminant := b*b - 4*a*c
+	return discriminant > 0
 }
