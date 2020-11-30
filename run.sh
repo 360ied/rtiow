@@ -1,5 +1,5 @@
 #!/usr/bin/fish
 
 go build
-./rtiow > out.ppm
+./rtiow >out.ppm
 eog out.ppm
