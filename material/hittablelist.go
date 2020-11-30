@@ -1,4 +1,4 @@
-package ray
+package material
 
 type HittableList struct {
 	Objects []Hittable
@@ -12,7 +12,7 @@ func (h *HittableList) Add(object Hittable) {
 	h.Objects = append(h.Objects, object)
 }
 
-func (h HittableList) Hit(r Ray, tMin float64, tMax float64) (rec Record, hitAnything bool) {
+func (h HittableList) Hit(r Ray, tMin float64, tMax float64) (rec HitRecord, hitAnything bool) {
 	closestSoFar := tMax
 	for _, object := range h.Objects {
 		if tempRec, hit := object.Hit(r, tMin, closestSoFar); hit {

@@ -1,11 +1,10 @@
-package ray
+package material
 
 import (
 	"math"
 
 	"rtiow/constants"
 	"rtiow/vec3"
-	"rtiow/vec3/vec3util"
 )
 
 type Ray struct {
@@ -31,8 +30,12 @@ func (r Ray) Colour(world Hittable, depth int) vec3.Colour {
 	if worldHit {
 		// return rec.Normal.AddVec3(vec3.Colour{X: 1, Y: 1, Z: 1}).MultiplyFloat(.5)
 		// target := rec.P.AddVec3(rec.Normal).AddVec3(vec3util.RandomInUnitSphere())
-		target := rec.P.AddVec3(vec3util.RandomInHemisphere(rec.Normal))
-		return Ray{rec.P, target.SubtractVec3(rec.P)}.Colour(world, depth-1).MultiplyFloat(.5)
+		// target := rec.P.AddVec3(vec3util.RandomInHemisphere(rec.Normal))
+		// return Ray{rec.P, target.SubtractVec3(rec.P)}.Colour(world, depth-1).MultiplyFloat(.5)
+		if attenuation, scattered, cond := rec.Mat.Scatter(r, rec); cond {
+			return attenuation.MultiplyVec3(scattered.Colour(world, depth-1))
+		}
+		return vec3.Colour{} // 0, 0, 0
 	}
 	unitDirection := r.Direction.UnitVector()
 	t := .5 * (unitDirection.Y + 1.0)

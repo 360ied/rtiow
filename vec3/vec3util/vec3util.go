@@ -42,3 +42,7 @@ func RandomInHemisphere(normal vec3.Vec3) vec3.Vec3 {
 		return inUnitSphere.Negate()
 	}
 }
+
+func RandomUnitVector() vec3.Vec3 {
+	return RandomInUnitSphere().UnitVector()
+}

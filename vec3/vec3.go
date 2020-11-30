@@ -95,3 +95,13 @@ func (v Vec3) Length() float64 {
 func (v Vec3) LengthSquared() float64 {
 	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
 }
+
+// Returns true if the vector is close to zero in all dimensions
+func (v Vec3) NearZero() bool {
+	const s = 1e-8
+	return math.Abs(v.X) < s && math.Abs(v.Y) < s && math.Abs(v.Z) < s
+}
+
+func (v Vec3) Reflect(n Vec3) Vec3 {
+	return v.SubtractVec3(n.MultiplyFloat(v.Dot(n)).MultiplyFloat(2))
+}
