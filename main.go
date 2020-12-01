@@ -48,11 +48,10 @@ func main() {
 	// Camera
 	cam := camera.NewCamera(vec3.Point3{-2, 2, 1}, vec3.Point3{0, 0, -1}, vec3.Vec3{0, 1, 0}, 90.0, aspectRatio)
 
+	// Render
 	wg := new(sync.WaitGroup)
-
 	img := make([]vec3.Colour, imageWidth*imageHeight)
 
-	// Render
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
 	for j := 0; j < imageHeight; j++ {
 		j := j
