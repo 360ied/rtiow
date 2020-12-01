@@ -30,7 +30,9 @@ func main() {
 	)
 
 	// World
+	_, _ = fmt.Fprintln(os.Stderr, "Generating random scene...")
 	world := randomScene()
+	_, _ = fmt.Fprintln(os.Stderr, "Done generating random scene.")
 
 	// Camera
 	lookFrom := vec3.Point3{13, 2, 3}
@@ -46,6 +48,7 @@ func main() {
 	img := make([]vec3.Colour, imageWidth*imageHeight)
 
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
+	_, _ = fmt.Fprintln(os.Stderr, "Starting render...")
 	for j := 0; j < imageHeight; j++ {
 		j := j
 		wg.Add(1)
@@ -64,8 +67,10 @@ func main() {
 			wg.Done()
 		}()
 	}
+	_, _ = fmt.Fprintln(os.Stderr, "Waiting for rendering to finish...")
 	wg.Wait()
 
+	_, _ = fmt.Fprintln(os.Stderr, "Rendering is done.\nWriting image...")
 	// The image comes out upside down, so go through it from the bottom to top to reverse it
 	for x := int(imageHeight) - 1; x >= 0; x-- {
 		for y := 0; y < imageWidth; y++ {
