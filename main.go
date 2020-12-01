@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"os"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"rtiow/camera"
 	"rtiow/colour"
@@ -23,9 +25,9 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 3840
+		imageWidth      = 1920
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 1000
+		samplesPerPixel = 500
 		maxDepth        = 100
 	)
 
@@ -47,6 +49,9 @@ func main() {
 	wg := new(sync.WaitGroup)
 	img := make([]vec3.Colour, imageWidth*imageHeight)
 
+	counter := uint64(0)
+	startTime := time.Now()
+
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
 	_, _ = fmt.Fprintln(os.Stderr, "Starting render...")
 	for j := 0; j < imageHeight; j++ {
@@ -62,11 +67,24 @@ func main() {
 					pixelColour = pixelColour.AddVec3(r.Colour(world, maxDepth))
 				}
 				img[j*imageWidth+i] = pixelColour
+				atomic.AddUint64(&counter, 1)
 			}
 			wg.Done()
 		}()
 	}
 	_, _ = fmt.Fprintln(os.Stderr, "Waiting for rendering to finish...")
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			pixelsDone := atomic.LoadUint64(&counter)
+			elapsedTime := time.Now().Sub(startTime)
+			_, _ = fmt.Fprintf(
+				os.Stderr,
+				"%v/%v pixels rendered. %v%v done. %v left.\n",
+				pixelsDone, len(img), float64(pixelsDone)/float64(len(img))*100, "%",
+				time.Duration(float64(uint64(len(img))-pixelsDone)/(float64(pixelsDone)/elapsedTime.Seconds()))*time.Second)
+		}
+	}()
 	wg.Wait()
 
 	_, _ = fmt.Fprintln(os.Stderr, "Rendering is done.\nWriting image...")
