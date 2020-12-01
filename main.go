@@ -29,9 +29,10 @@ func main() {
 	materialGround := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.8, Y: 0.8}}
 	// materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.7, Y: 0.3, Z: 0.3}}
 	// materialLeft := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.8, Z: 0.8}, Fuzz: 0.3}
-	materialCenter := dielectric.Dielectric{IR: 1.5}
+	// materialCenter := dielectric.Dielectric{IR: 1.5}
+	materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.1, Y: 0.2, Z: 0.5}}
 	materialLeft := dielectric.Dielectric{IR: 1.5}
-	materialRight := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.6, Z: 0.2}, Fuzz: 1.0}
+	materialRight := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.6, Z: 0.2}, Fuzz: 0.0}
 
 	// World
 	world := material.HittableList{
@@ -55,6 +56,11 @@ func main() {
 				Center: vec3.Point3{X: 1.0, Z: -1.0}, // 1.0, 0.0, -1.0
 				Radius: 0.5,
 				Mat:    materialRight,
+			},
+			sphere.Sphere{
+				Center: vec3.Point3{X: -1.0, Z: -1.0}, // -1.0, 0.0, -1.0
+				Radius: -0.4,
+				Mat:    materialLeft,
 			},
 		},
 	}
