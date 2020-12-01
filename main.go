@@ -21,10 +21,10 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 1920
+		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 100
-		maxDepth        = 50
+		samplesPerPixel = 20
+		maxDepth        = 10
 	)
 
 	// World
@@ -46,7 +46,13 @@ func main() {
 	world.Add(sphere.Sphere{vec3.Point3{1.0, 0.0, -1.0}, 0.5, matRight})
 
 	// Camera
-	cam := camera.NewCamera(vec3.Point3{-2, 2, 1}, vec3.Point3{0, 0, -1}, vec3.Vec3{0, 1, 0}, 90.0, aspectRatio)
+	lookFrom := vec3.Point3{3, 3, 2}
+	lookAt := vec3.Point3{0, 0, -1}
+	vUp := vec3.Vec3{0, 1, 0}
+	distToFocus := (lookFrom.SubtractVec3(lookAt)).Length()
+	aperture := 2.0
+
+	cam := camera.NewCamera(lookFrom, lookAt, vUp, 20, aspectRatio, aperture, distToFocus)
 
 	// Render
 	wg := new(sync.WaitGroup)

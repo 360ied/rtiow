@@ -46,3 +46,13 @@ func RandomInHemisphere(normal vec3.Vec3) vec3.Vec3 {
 func RandomUnitVector() vec3.Vec3 {
 	return RandomInUnitSphere().UnitVector()
 }
+
+func RandomInUnitDisk() vec3.Vec3 {
+	for {
+		p := vec3.Vec3{X: helpers.RandFloat64(-1, 1), Y: helpers.RandFloat64(-1, 1)}
+		if p.LengthSquared() >= 1 {
+			continue
+		}
+		return p
+	}
+}
