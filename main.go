@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"sync"
@@ -9,9 +10,7 @@ import (
 	"rtiow/camera"
 	"rtiow/colour"
 	"rtiow/material"
-	"rtiow/material/dielectric"
 	"rtiow/material/lambertian"
-	"rtiow/material/metal"
 	"rtiow/sphere"
 	"rtiow/vec3"
 )
@@ -22,65 +21,30 @@ func main() {
 		aspectRatio     = 16.0 / 9.0
 		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 50
-		maxDepth        = 25
+		samplesPerPixel = 25
+		maxDepth        = 10
 	)
 
-	materialGround := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.8, Y: 0.8}}
-	// materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.7, Y: 0.3, Z: 0.3}}
-	// materialLeft := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.8, Z: 0.8}, Fuzz: 0.3}
-	// materialCenter := dielectric.Dielectric{IR: 1.5}
-	materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.1, Y: 0.2, Z: 0.5}}
-	materialLeft := dielectric.Dielectric{IR: 1.5}
-	materialRight := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.6, Z: 0.2}, Fuzz: 0.0}
-
 	// World
+	r := math.Cos(math.Pi / 4)
+
 	world := material.HittableList{
 		Objects: []material.Hittable{
 			sphere.Sphere{
-				Center: vec3.Point3{Y: -100.5, Z: -1.0}, // 0.0, -100.5, -1.0
-				Radius: 100.0,
-				Mat:    materialGround,
+				Center: vec3.Point3{X: -r, Z: -1},
+				Radius: r,
+				Mat:    lambertian.Lambertian{Albedo: vec3.Colour{Z: 1}},
 			},
 			sphere.Sphere{
-				Center: vec3.Point3{Z: -1.0}, // 0.0, 0.0, -1.0
-				Radius: 0.5,
-				Mat:    materialCenter,
-			},
-			sphere.Sphere{
-				Center: vec3.Point3{X: -1.0, Z: -1.0}, // -1.0, 0.0, -1.0
-				Radius: 0.5,
-				Mat:    materialLeft,
-			},
-			sphere.Sphere{
-				Center: vec3.Point3{X: 1.0, Z: -1.0}, // 1.0, 0.0, -1.0
-				Radius: 0.5,
-				Mat:    materialRight,
-			},
-			sphere.Sphere{
-				Center: vec3.Point3{X: -1.0, Z: -1.0}, // -1.0, 0.0, -1.0
-				Radius: -0.4,
-				Mat:    materialLeft,
+				Center: vec3.Point3{X: r, Z: -1},
+				Radius: r,
+				Mat:    lambertian.Lambertian{Albedo: vec3.Colour{X: 1}},
 			},
 		},
 	}
 
 	// Camera
-	const (
-		viewportHeight = 2.0
-		viewportWidth  = aspectRatio * viewportHeight
-		focalLength    = 1.0
-	)
-	origin := vec3.Point3{}                   // 0, 0, 0
-	horizontal := vec3.Vec3{X: viewportWidth} // viewportWidth, 0, 0
-	vertical := vec3.Vec3{Y: viewportHeight}  // 0, viewportHeight, 0
-	// lowerLeftCorner := origin.SubtractVec3(
-	// 	horizontal.DivideFloat(2.0),
-	// ).SubtractVec3(
-	// 	vertical.DivideFloat(2.0),
-	// ).SubtractVec3(vec3.Vec3{Z: focalLength}) // 0, 0, focalLength
-
-	cam := camera.NewCamera(aspectRatio, viewportHeight, focalLength, origin, horizontal, vertical)
+	cam := camera.NewCamera(90.0, aspectRatio)
 
 	wg := new(sync.WaitGroup)
 

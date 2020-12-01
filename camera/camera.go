@@ -1,6 +1,9 @@
 package camera
 
 import (
+	"math"
+
+	"rtiow/helpers"
 	"rtiow/material"
 	"rtiow/vec3"
 )
@@ -18,14 +21,26 @@ type Camera struct {
 }
 
 func NewCamera(
-	aspectRatio, viewportHeight, focalLength float64,
-	origin vec3.Point3,
-	horizontal, vertical vec3.Vec3,
+	// aspectRatio, viewportHeight, focalLength float64,
+	// origin vec3.Point3,
+	// horizontal, vertical vec3.Vec3,
+	vFov, aspectRatio float64,
 ) Camera {
+	theta := helpers.DegreesToRadians(vFov)
+	h := math.Tan(theta / 2.0)
+	viewportHeight := 2.0 * h
+	viewportWidth := aspectRatio * viewportHeight
+
+	const focalLength = 1.0
+
+	origin := vec3.Point3{} // 0, 0, 0
+	horizontal := vec3.Vec3{X: viewportWidth}
+	vertical := vec3.Vec3{Y: viewportHeight}
+
 	return Camera{
 		AspectRatio:    aspectRatio,
 		ViewportHeight: viewportHeight,
-		ViewportWidth:  aspectRatio * viewportHeight,
+		ViewportWidth:  viewportWidth,
 		FocalLength:    focalLength,
 		Origin:         origin,
 		Horizontal:     horizontal,

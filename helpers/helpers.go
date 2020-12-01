@@ -13,3 +13,7 @@ func Clamp(x, min, max float64) float64 {
 func RandFloat64(min, max float64) float64 {
 	return min + (max-min)*rand.Float64()
 }
+
+func DegreesToRadians(degrees float64) float64 {
+	return degrees * math.Pi / 180.0
+}
