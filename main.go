@@ -8,12 +8,14 @@ import (
 
 	"rtiow/camera"
 	"rtiow/colour"
+	"rtiow/helpers"
 	"rtiow/material"
 	"rtiow/material/dielectric"
 	"rtiow/material/lambertian"
 	"rtiow/material/metal"
 	"rtiow/sphere"
 	"rtiow/vec3"
+	"rtiow/vec3/vec3util"
 )
 
 //goland:noinspection GoStructInitializationWithoutFieldNames
@@ -21,36 +23,21 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 400
+		imageWidth      = 3840
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 20
-		maxDepth        = 10
+		samplesPerPixel = 1000
+		maxDepth        = 100
 	)
 
 	// World
-	matGround := lambertian.Lambertian{vec3.Colour{0.8, 0.8, 0.0}}
-	matCenter := lambertian.Lambertian{vec3.Colour{0.1, 0.2, 0.5}}
-	matLeft := dielectric.Dielectric{1.5}
-	matRight := metal.Metal{vec3.Colour{0.8, 0.6, 0.2}, 0.0}
-
-	world := material.HittableList{}
-	// ground
-	world.Add(sphere.Sphere{vec3.Point3{0.0, -100.5, -1.0}, 100.0, matGround})
-	// blue ball in the center
-	world.Add(sphere.Sphere{vec3.Point3{0.0, 0.0, -1.0}, 0.5, matCenter})
-	// glass ball on the left
-	world.Add(sphere.Sphere{vec3.Point3{-1.0, 0.0, -1.0}, 0.5, matLeft})
-	// negative radius glass ball within the glass ball on the left
-	world.Add(sphere.Sphere{vec3.Point3{-1.0, 0.0, -1.0}, -0.45, matLeft})
-	// yellow metal ball on the right
-	world.Add(sphere.Sphere{vec3.Point3{1.0, 0.0, -1.0}, 0.5, matRight})
+	world := randomScene()
 
 	// Camera
-	lookFrom := vec3.Point3{3, 3, 2}
-	lookAt := vec3.Point3{0, 0, -1}
+	lookFrom := vec3.Point3{13, 2, 3}
+	lookAt := vec3.Point3{0, 0, 0}
 	vUp := vec3.Vec3{0, 1, 0}
-	distToFocus := (lookFrom.SubtractVec3(lookAt)).Length()
-	aperture := 2.0
+	distToFocus := 10.0
+	aperture := 0.1
 
 	cam := camera.NewCamera(lookFrom, lookAt, vUp, 20, aspectRatio, aperture, distToFocus)
 
@@ -87,4 +74,48 @@ func main() {
 	}
 
 	_, _ = fmt.Fprintf(os.Stderr, "Done.\n")
+}
+
+func randomScene() material.HittableList {
+	world := material.HittableList{}
+
+	groundMaterial := lambertian.Lambertian{vec3.Colour{0.5, 0.5, 0.5}}
+	world.Add(sphere.Sphere{vec3.Point3{0, -1000, 0}, 1000, groundMaterial})
+
+	for a := -11; a < 11; a++ {
+		for b := -11; b < 11; b++ {
+			chooseMat := rand.Float64()
+			center := vec3.Point3{float64(a) + 0.9*rand.Float64(), 0.2, float64(b) + 0.9*rand.Float64()}
+
+			if center.SubtractVec3(vec3.Point3{4, 0.2, 0}).Length() > 0.9 {
+				if chooseMat < 0.8 {
+					// diffuse
+					albedo := vec3util.Random().MultiplyVec3(vec3util.Random())
+					sphereMaterial := lambertian.Lambertian{albedo}
+					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+				} else if chooseMat < 0.95 {
+					// metal
+					albedo := vec3util.RandomMinMax(0.5, 1)
+					fuzz := helpers.RandFloat64(0, 0.5)
+					sphereMaterial := metal.Metal{albedo, fuzz}
+					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+				} else {
+					// glass
+					sphereMaterial := dielectric.Dielectric{1.5}
+					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+				}
+			}
+		}
+	}
+
+	material1 := dielectric.Dielectric{1.5}
+	world.Add(sphere.Sphere{vec3.Point3{0, 1, 0}, 1.0, material1})
+
+	material2 := lambertian.Lambertian{vec3.Colour{0.4, 0.2, 0.1}}
+	world.Add(sphere.Sphere{vec3.Point3{-4, 1, 0}, 1.0, material2})
+
+	material3 := metal.Metal{vec3.Colour{0.7, 0.6, 0.5}, 0.0}
+	world.Add(sphere.Sphere{vec3.Point3{4, 1, 0}, 1.0, material3})
+
+	return world
 }
