@@ -6,8 +6,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/oleiade/lane"
-
 	"rtiow/camera"
 	"rtiow/colour"
 	"rtiow/material"
@@ -21,10 +19,10 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 1920
+		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 100
-		maxDepth        = 50
+		samplesPerPixel = 50
+		maxDepth        = 25
 	)
 
 	materialGround := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.8, Y: 0.8}}
@@ -76,11 +74,12 @@ func main() {
 	cam := camera.NewCamera(aspectRatio, viewportHeight, focalLength, origin, horizontal, vertical)
 
 	wg := new(sync.WaitGroup)
-	pqueue := lane.NewPQueue(lane.MAXPQ)
+
+	img := make([]vec3.Colour, imageWidth*imageHeight)
 
 	// Render
 	fmt.Printf("P3\n%v %v\n255\n", imageWidth, imageHeight)
-	for j := int(imageHeight - 1); j >= 0; j-- {
+	for j := 0; j < imageHeight; j++ {
 		j := j
 		wg.Add(1)
 		go func() {
@@ -92,20 +91,19 @@ func main() {
 					r := cam.Ray(u, v)
 					pixelColour = pixelColour.AddVec3(r.Colour(world, maxDepth))
 				}
-				colour.WriteColour(pqueue, pixelColour, samplesPerPixel, j*imageWidth-i)
+				// colour.WriteColour(pqueue, pixelColour, samplesPerPixel, j*imageWidth-i)
+				img[j*imageWidth+i] = pixelColour
 			}
 			wg.Done()
 		}()
 	}
-
 	wg.Wait()
 
-	for {
-		pix, _ := pqueue.Pop()
-		if pix == nil {
-			break
+	// The image comes out upside down, so go through it from the bottom to top to reverse it
+	for x := int(imageHeight) - 1; x >= 0; x-- {
+		for y := 0; y < imageWidth; y++ {
+			colour.WriteColour(img[x*imageWidth+y], samplesPerPixel)
 		}
-		fmt.Print(pix)
 	}
 
 	_, _ = fmt.Fprintf(os.Stderr, "Done.\n")

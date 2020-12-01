@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/oleiade/lane"
-
 	"rtiow/constants"
 	"rtiow/helpers"
 	"rtiow/vec3"
 )
 
-func WriteColour(out *lane.PQueue, v vec3.Colour, samplesPerPixel int, position int) {
+func WriteColour(v vec3.Colour, samplesPerPixel int) {
 	r := v.X
 	g := v.Y
 	b := v.Z
@@ -22,7 +20,7 @@ func WriteColour(out *lane.PQueue, v vec3.Colour, samplesPerPixel int, position 
 	b = divSampleGammaCorrect(b, samplesPerPixel)
 
 	// Write translated value of each colour component
-	out.Push(fmt.Sprintf("%v %v %v\n", normalize(r), normalize(g), normalize(b)), position)
+	fmt.Printf("%v %v %v\n", normalize(r), normalize(g), normalize(b))
 }
 
 func normalize(n float64) int {
