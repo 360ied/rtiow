@@ -40,7 +40,7 @@ func main() {
 	world.Add(sphere.Sphere{vec3.Point3{0.0, 0.0, -1.0}, 0.5, matCenter})
 	// glass ball on the left
 	world.Add(sphere.Sphere{vec3.Point3{-1.0, 0.0, -1.0}, 0.5, matLeft})
-	// slightly smaller glass ball within the glass ball on the left
+	// negative radius glass ball within the glass ball on the left
 	world.Add(sphere.Sphere{vec3.Point3{-1.0, 0.0, -1.0}, -0.45, matLeft})
 	// yellow metal ball on the right
 	world.Add(sphere.Sphere{vec3.Point3{1.0, 0.0, -1.0}, 0.5, matRight})
