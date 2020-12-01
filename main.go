@@ -61,7 +61,6 @@ func main() {
 					r := cam.Ray(u, v)
 					pixelColour = pixelColour.AddVec3(r.Colour(world, maxDepth))
 				}
-				// colour.WriteColour(pqueue, pixelColour, samplesPerPixel, j*imageWidth-i)
 				img[j*imageWidth+i] = pixelColour
 			}
 			wg.Done()
