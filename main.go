@@ -9,6 +9,7 @@ import (
 	"rtiow/camera"
 	"rtiow/colour"
 	"rtiow/material"
+	"rtiow/material/dielectric"
 	"rtiow/material/lambertian"
 	"rtiow/material/metal"
 	"rtiow/sphere"
@@ -26,8 +27,10 @@ func main() {
 	)
 
 	materialGround := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.8, Y: 0.8}}
-	materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.7, Y: 0.3, Z: 0.3}}
-	materialLeft := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.8, Z: 0.8}, Fuzz: 0.3}
+	// materialCenter := lambertian.Lambertian{Albedo: vec3.Colour{X: 0.7, Y: 0.3, Z: 0.3}}
+	// materialLeft := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.8, Z: 0.8}, Fuzz: 0.3}
+	materialCenter := dielectric.Dielectric{IR: 1.5}
+	materialLeft := dielectric.Dielectric{IR: 1.5}
 	materialRight := metal.Metal{Albedo: vec3.Colour{X: 0.8, Y: 0.6, Z: 0.2}, Fuzz: 1.0}
 
 	// World

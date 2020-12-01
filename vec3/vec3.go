@@ -105,3 +105,10 @@ func (v Vec3) NearZero() bool {
 func (v Vec3) Reflect(n Vec3) Vec3 {
 	return v.SubtractVec3(n.MultiplyFloat(v.Dot(n)).MultiplyFloat(2))
 }
+
+func (v Vec3) Refract(n Vec3, etaiOverEtat float64) Vec3 {
+	cosTheta := math.Min(v.Negate().Dot(n), 1.0)
+	rOutPerp := v.AddVec3(n.MultiplyFloat(cosTheta)).MultiplyFloat(etaiOverEtat)
+	rOutParallel := n.MultiplyFloat(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
+	return rOutPerp.AddVec3(rOutParallel)
+}
