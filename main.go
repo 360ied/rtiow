@@ -15,7 +15,8 @@ import (
 	"rtiow/material/dielectric"
 	"rtiow/material/lambertian"
 	"rtiow/material/metal"
-	"rtiow/sphere"
+	"rtiow/shapes/movingsphere"
+	"rtiow/shapes/sphere"
 	"rtiow/vec3"
 	"rtiow/vec3/vec3util"
 )
@@ -25,10 +26,10 @@ func main() {
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
-		imageWidth      = 1920
+		imageWidth      = 400
 		imageHeight     = imageWidth / aspectRatio
-		samplesPerPixel = 500
-		maxDepth        = 100
+		samplesPerPixel = 100
+		maxDepth        = 50
 	)
 
 	// World
@@ -43,7 +44,7 @@ func main() {
 	distToFocus := 10.0
 	aperture := 0.1
 
-	cam := camera.NewCamera(lookFrom, lookAt, vUp, 20, aspectRatio, aperture, distToFocus)
+	cam := camera.NewCamera(lookFrom, lookAt, vUp, 20, aspectRatio, aperture, distToFocus, 0.0, 1.0)
 
 	// Render
 	wg := new(sync.WaitGroup)
@@ -114,7 +115,9 @@ func randomScene() material.HittableList {
 					// diffuse
 					albedo := vec3util.Random().MultiplyVec3(vec3util.Random())
 					sphereMaterial := lambertian.Lambertian{albedo}
-					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+					center2 := center.AddVec3(vec3.Vec3{0, helpers.RandFloat64(0, 0.5), 0})
+					// world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+					world.Add(movingsphere.MovingSphere{center, center2, 0.0, 1.0, 0.2, sphereMaterial})
 				} else if chooseMat < 0.95 {
 					// metal
 					albedo := vec3util.RandomMinMax(0.5, 1)

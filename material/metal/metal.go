@@ -16,6 +16,7 @@ func (m Metal) Scatter(rIn material.Ray, rec material.HitRecord) (vec3.Colour, m
 	scattered := material.Ray{
 		Origin:    rec.P,
 		Direction: reflected.AddVec3(vec3util.RandomInUnitSphere().MultiplyFloat(m.Fuzz)),
+		Time:      rIn.Time,
 	}
 	attenuation := m.Albedo
 	return attenuation, scattered, scattered.Direction.Dot(rec.Normal) > 0

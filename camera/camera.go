@@ -16,12 +16,14 @@ type Camera struct {
 	lowerLeftCorner vec3.Vec3
 	u, v, w         vec3.Vec3
 	lensRadius      float64
+	time0, time1    float64 // shutter open/close times
 }
 
 func NewCamera(
 	lookFrom, lookAt vec3.Point3,
 	vUp vec3.Vec3,
 	vFov, aspectRatio, aperture, focusDist float64,
+	time0, time1 float64,
 ) (cam Camera) {
 	theta := helpers.DegreesToRadians(vFov)
 	h := math.Tan(theta / 2.0)
@@ -40,6 +42,8 @@ func NewCamera(
 		SubtractVec3(cam.vertical.DivideFloat(2.0)).
 		SubtractVec3(cam.w.MultiplyFloat(focusDist))
 	cam.lensRadius = aperture / 2
+	cam.time0 = time0
+	cam.time1 = time1
 	return
 }
 
@@ -55,5 +59,6 @@ func (c Camera) Ray(s, t float64) material.Ray {
 			AddVec3(c.vertical.MultiplyFloat(t)).
 			SubtractVec3(c.origin).
 			SubtractVec3(offset),
+		Time: helpers.RandFloat64(c.time0, c.time1),
 	}
 }

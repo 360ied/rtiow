@@ -32,7 +32,7 @@ func (d Dielectric) Scatter(rIn material.Ray, rec material.HitRecord) (vec3.Colo
 		direction = unitDirection.Refract(rec.Normal, refractionRatio)
 	}
 
-	scattered := material.Ray{Origin: rec.P, Direction: direction}
+	scattered := material.Ray{Origin: rec.P, Direction: direction, Time: rIn.Time}
 	return attenuation, scattered, true
 }
 

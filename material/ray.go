@@ -10,6 +10,7 @@ import (
 type Ray struct {
 	Origin    vec3.Point3
 	Direction vec3.Vec3
+	Time      float64
 }
 
 func (r Ray) At(t float64) vec3.Point3 {
