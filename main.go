@@ -8,6 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/veandco/go-sdl2/sdl"
+
 	"rtiow/camera"
 	"rtiow/colour"
 	"rtiow/helpers"
@@ -23,6 +25,8 @@ import (
 
 //goland:noinspection GoStructInitializationWithoutFieldNames
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	// Image
 	const (
 		aspectRatio     = 16.0 / 9.0
@@ -31,6 +35,33 @@ func main() {
 		samplesPerPixel = 100
 		maxDepth        = 50
 	)
+
+	// Create window
+	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		panic(err)
+	}
+	defer sdl.Quit()
+
+	window, windowErr := sdl.CreateWindow("RTIOW", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, imageWidth, imageHeight, sdl.WINDOW_SHOWN)
+	if windowErr != nil {
+		panic(windowErr)
+	}
+	defer func() {
+		windowDestroyErr := window.Destroy()
+		if windowDestroyErr != nil {
+			panic(windowDestroyErr)
+		}
+	}()
+
+	surface, surfaceErr := window.GetSurface()
+	if surfaceErr != nil {
+		panic(surfaceErr)
+	}
+
+	surfaceFillRectErr := surface.FillRect(nil, 0)
+	if surfaceFillRectErr != nil {
+		panic(surfaceFillRectErr)
+	}
 
 	// World
 	_, _ = fmt.Fprintln(os.Stderr, "Generating random scene...")
@@ -69,6 +100,8 @@ func main() {
 				}
 				img[j*imageWidth+i] = pixelColour
 				atomic.AddUint64(&counter, 1)
+				surface.Set(i, imageHeight-j-1, colour.VecColour{pixelColour, samplesPerPixel})
+				// _ = window.UpdateSurface()
 			}
 			wg.Done()
 		}()
@@ -79,6 +112,7 @@ func main() {
 			time.Sleep(1 * time.Second)
 			pixelsDone := atomic.LoadUint64(&counter)
 			elapsedTime := time.Now().Sub(startTime)
+			_ = window.UpdateSurface()
 			_, _ = fmt.Fprintf(
 				os.Stderr,
 				"%v/%v pixels rendered. %v%v done. %v left.\n",
@@ -87,6 +121,8 @@ func main() {
 		}
 	}()
 	wg.Wait()
+
+	_, _ = fmt.Fprintf(os.Stderr, "Took %v\n", time.Now().Sub(startTime))
 
 	_, _ = fmt.Fprintln(os.Stderr, "Rendering is done.\nWriting image...")
 	// The image comes out upside down, so go through it from the bottom to top to reverse it

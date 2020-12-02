@@ -27,6 +27,33 @@ func normalize(n float64) int {
 	return int(constants.Almost256 * helpers.Clamp(n, 0.0, constants.Almost1))
 }
 
+func normalize65535(n float64) uint32 {
+	const almost65535 = 65534.999
+	return uint32(almost65535 * helpers.Clamp(n, 0.0, almost65535))
+}
+
 func divSampleGammaCorrect(t float64, samplesPerPixel int) float64 {
 	return math.Sqrt(t / float64(samplesPerPixel))
+}
+
+type VecColour struct {
+	vec3.Colour
+	SamplesPerPixel int
+}
+
+func (c VecColour) RGBA() (uint32, uint32, uint32, uint32) {
+	return ToColour(c)
+}
+
+func ToColour(v VecColour) (uint32, uint32, uint32, uint32) {
+	r := v.X
+	g := v.Y
+	b := v.Z
+
+	// Divide colour by the number of samples
+	r = divSampleGammaCorrect(r, v.SamplesPerPixel)
+	g = divSampleGammaCorrect(g, v.SamplesPerPixel)
+	b = divSampleGammaCorrect(b, v.SamplesPerPixel)
+
+	return normalize65535(r), normalize65535(g), normalize65535(b), 65535
 }
