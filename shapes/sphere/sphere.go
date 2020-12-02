@@ -11,9 +11,21 @@ type Sphere struct {
 	Center vec3.Point3
 	Radius float64
 	Mat    material.Material
+	box    material.Box
+}
+
+func NewSphere(center vec3.Point3, radius float64, mat material.Material) Sphere {
+	return Sphere{center, radius, mat, material.Box{center.SubtractFloat(radius), center.AddFloat(radius)}}
+}
+
+func (s Sphere) Box() material.Box {
+	return s.box
 }
 
 func (s Sphere) Hit(r material.Ray, tMin float64, tMax float64) (material.HitRecord, bool) {
+	// if !s.box.Hit(r, tMin, tMax) {
+	// 	return material.HitRecord{}, false
+	// }
 	oc := r.Origin.SubtractVec3(s.Center)
 	a := r.Direction.LengthSquared()
 	halfB := oc.Dot(r.Direction)

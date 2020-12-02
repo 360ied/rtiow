@@ -103,7 +103,7 @@ func randomScene() material.HittableList {
 	world := material.HittableList{}
 
 	groundMaterial := lambertian.Lambertian{vec3.Colour{0.5, 0.5, 0.5}}
-	world.Add(sphere.Sphere{vec3.Point3{0, -1000, 0}, 1000, groundMaterial})
+	world.Add(sphere.NewSphere(vec3.Point3{0, -1000, 0}, 1000, groundMaterial))
 
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
@@ -117,30 +117,30 @@ func randomScene() material.HittableList {
 					sphereMaterial := lambertian.Lambertian{albedo}
 					center2 := center.AddVec3(vec3.Vec3{0, helpers.RandFloat64(0, 0.5), 0})
 					// world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
-					world.Add(movingsphere.MovingSphere{center, center2, 0.0, 1.0, 0.2, sphereMaterial})
+					world.Add(movingsphere.NewMovingSphere(center, center2, 0.0, 1.0, 0.2, sphereMaterial))
 				} else if chooseMat < 0.95 {
 					// metal
 					albedo := vec3util.RandomMinMax(0.5, 1)
 					fuzz := helpers.RandFloat64(0, 0.5)
 					sphereMaterial := metal.Metal{albedo, fuzz}
-					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+					world.Add(sphere.NewSphere(center, 0.2, sphereMaterial))
 				} else {
 					// glass
 					sphereMaterial := dielectric.Dielectric{1.5}
-					world.Add(sphere.Sphere{center, 0.2, sphereMaterial})
+					world.Add(sphere.NewSphere(center, 0.2, sphereMaterial))
 				}
 			}
 		}
 	}
 
 	material1 := dielectric.Dielectric{1.5}
-	world.Add(sphere.Sphere{vec3.Point3{0, 1, 0}, 1.0, material1})
+	world.Add(sphere.NewSphere(vec3.Point3{0, 1, 0}, 1.0, material1))
 
 	material2 := lambertian.Lambertian{vec3.Colour{0.4, 0.2, 0.1}}
-	world.Add(sphere.Sphere{vec3.Point3{-4, 1, 0}, 1.0, material2})
+	world.Add(sphere.NewSphere(vec3.Point3{-4, 1, 0}, 1.0, material2))
 
 	material3 := metal.Metal{vec3.Colour{0.7, 0.6, 0.5}, 0.0}
-	world.Add(sphere.Sphere{vec3.Point3{4, 1, 0}, 1.0, material3})
+	world.Add(sphere.NewSphere(vec3.Point3{4, 1, 0}, 1.0, material3))
 
 	return world
 }

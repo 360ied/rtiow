@@ -24,4 +24,5 @@ func (r HitRecord) FaceNormal(ray Ray, outwardNormal vec3.Vec3) HitRecord {
 
 type Hittable interface {
 	Hit(r Ray, tMin float64, tMax float64) (HitRecord, bool)
+	Box() Box
 }

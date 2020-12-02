@@ -12,9 +12,36 @@ type MovingSphere struct {
 	Time0, Time1     float64
 	Radius           float64
 	Mat              material.Material
+	box              material.Box
+}
+
+func NewMovingSphere(center0, center1 vec3.Point3, time0, time1, radius float64, mat material.Material) MovingSphere {
+	return MovingSphere{
+		center0,
+		center1,
+		time0,
+		time1,
+		radius,
+		mat,
+		material.Box{
+			center0.SubtractFloat(radius),
+			center0.AddFloat(radius),
+		}.Surrounding(
+			material.Box{
+				center1.SubtractFloat(radius),
+				center1.AddFloat(radius),
+			}),
+	}
+}
+
+func (s MovingSphere) Box() material.Box {
+	return s.box
 }
 
 func (s MovingSphere) Hit(r material.Ray, tMin float64, tMax float64) (material.HitRecord, bool) {
+	// if !s.box.Hit(r, tMin, tMax) {
+	// 	return material.HitRecord{}, false
+	// }
 	oc := r.Origin.SubtractVec3(s.Center(r.Time))
 	a := r.Direction.LengthSquared()
 	halfB := oc.Dot(r.Direction)
@@ -46,6 +73,6 @@ func (s MovingSphere) Hit(r material.Ray, tMin float64, tMax float64) (material.
 	return rec, true
 }
 
-func (m MovingSphere) Center(time float64) vec3.Point3 {
-	return m.Center0.AddVec3(m.Center1.SubtractVec3(m.Center0).MultiplyFloat((time - m.Time0) / (m.Time1 - m.Time0)))
+func (s MovingSphere) Center(time float64) vec3.Point3 {
+	return s.Center0.AddVec3(s.Center1.SubtractVec3(s.Center0).MultiplyFloat((time - s.Time0) / (s.Time1 - s.Time0)))
 }
